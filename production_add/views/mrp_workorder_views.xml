@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="mrp_workorder_form">
+            <field name="name">mrp.workorder.form</field>
+            <field name="model">mrp.workorder</field>
+            <field name="inherit_id" ref="mrp.mrp_production_workorder_form_view_inherit"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='button_scrap']" position="after">
+                    <button name="batch_provide_lots" type="object" string="批量设置组件批次"
+                            attrs="{'invisible': ['|',('active_move_line_ids', '=', []),('state','!=','progress')]}"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

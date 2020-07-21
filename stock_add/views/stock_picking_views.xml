@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="stock_picking_form">
+            <field name="name">stock_picking_form</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='button_validate']" position="after">
+                    <button name="back_validate" type="object" string="取消验证"
+                            attrs="{'invisible':['|',('state','!=','done'),('is_locked','=',False)]}"/>
+                </xpath>
+                <xpath expr="//button[@name='button_scrap']" position="after">
+                    <button name="batch_finish" type="object" string="批量完成"
+                            attrs="{'invisible':['|',('state','in',['draft','cancel','done']),('is_locked','=',False)]}"/>
+                    <button name="button_create_lots" type="object" string="创建批次/序列号"
+                            attrs="{'invisible':['|','|',('picking_type_code','!=','incoming'),
+                            ('state','!=','assigned'),('is_locked','=',False)]}"/>
+                </xpath>
+                <xpath expr="//field[@name='move_ids_without_package']/tree/button[@name='action_show_details']"
+                       position="after">
+                    <button name="action_show_details_wizard" type="object" string="自选保留数量" icon="fa-list-alt"
+                            attrs="{'invisible':['|',('parent.picking_type_code','=','incoming'),('parent.state','in',['draft','cancel','done'])]}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="stock_picking_tree">
+            <field name="name">stock_picking_tree</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.vpicktree"/>
+            <field name="arch" type="xml">
+                <field name="location_dest_id" position="before">
+                    <field name="location_id"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem name="TEST" id="test.menu_root" sequence="99999"/>
+    <menuitem name="models" id="test.menu_models" parent="test.menu_root"/>
+    <menuitem name="Echarts" id="test.echarts" parent="test.menu_models" action="test.action_echarts_kanban"/>
+
+<!--    <menuitem id="menu_echarts" name="Echarts Page" action="test.action_echarts_page" groups="base.group_user"-->
+<!--              sequence="1" parent="test.menu_root"/>-->
+    <menuitem id="address_menu" name="地址" parent="test.menu_root"/>
+    <menuitem id="state" name="省" parent="address_menu"
+              action="state_act" sequence="1"/>
+    <menuitem id="city" name="市" parent="address_menu"
+              action="city_act" sequence="2"/>
+</odoo>

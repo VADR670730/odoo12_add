@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="DemoPage">
+        <div id="demoItems">
+            <div class="demoItem" id="item_pie" onclick="pie()" title="饼状图"></div>
+            <div class="demoItem" id="item_bar" onclick="bar()" title="柱状图"></div>
+            <div class="demoItem" id="item_gauge" onclick="gauge()" title="仪表盘"></div>
+        </div>
+        <button class="btn btn-success" id="return" onclick="showBTN()" hidden="hidden">返回</button>
+        <div id="main_pie" style="height:560px;" hidden="hidden"></div>
+        <div id="main_bar" style="height:560px;" hidden="hidden"></div>
+        <div id="main_gauge" style="height:560px;" hidden="hidden"></div>
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/custom_page/static/lib/bootstrap/css/bootstrap.min.css"/>
+            <link rel="stylesheet" href="/custom_page/static/src/css/demo.css"/>
+            <script type="text/javascript" src="/custom_page/static/lib/echarts/echarts.min.js"></script>
+            <script type="text/javascript" src="/custom_page/static/src/js/echarts_mine.js"></script>
+        </xpath>
+    </t>
+</templates>

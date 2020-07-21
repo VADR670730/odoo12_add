@@ -1,0 +1,18 @@
+#demoItems .demoItem {
+    display: inline-block;
+    border: 1px solid black;
+    margin: 2px;
+    width: 350px;
+    height: 300px;
+}
+
+#demoItems .demoItem:hover {
+    background-color: wheat;
+}
+
+#return {
+    position: absolute;
+    top: 50px;
+    right: 40px;
+    z-index: 39
+}

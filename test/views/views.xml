@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="test_echarts_kanban">
+        <field name="name">test_echarts_kanban</field>
+        <field name="model">test.echarts</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <field name="name"/>
+                            <div id="panel"/>
+                        </div>
+                    </t>
+                    <xpath expr="." position="inside">
+                        <script type="text/javascript" src="/test/static/lib/echarts.common.min.js"/>
+                        <script type="text/javascript" src="/test/static/lib/echarts.js"/>
+                        <script type="text/javascript" src="/test/static/src/my_echarts.js"/>
+                    </xpath>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="test_echarts_tree">
+        <field name="name">test_echarts_tree</field>
+        <field name="model">test.echarts</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="type"/>
+                <!--<field name="a"/>
+                <field name="b"/>
+                <field name="c"/>
+                <field name="d"/>
+                <field name="e"/>
+                <field name="f"/>
+                <field name="g"/>
+                <field name="h"/>
+                <field name="i"/>
+                <field name="j"/>
+                <field name="k"/>
+                <field name="l"/>
+                <field name="m"/>
+                <field name="n"/>
+                <field name="o"/>
+                <field name="p"/>
+                <field name="q"/>
+                <field name="r"/>
+                <field name="s"/>
+                <field name="t"/>
+                <field name="u"/>
+                <field name="v"/>
+                <field name="w"/>
+                <field name="x"/>
+                <field name="y"/>
+                <field name="z"/>-->
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="test.action_echarts_kanban">
+        <field name="name">Echats</field>
+        <field name="res_model">test.echarts</field>
+        <field name="view_mode">tree,form,kanban</field>
+    </record>
+
+</odoo>
