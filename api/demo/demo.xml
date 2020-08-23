@@ -1,0 +1,9 @@
+<odoo>
+    <data>
+
+        <record id="api_model_1" model="api.model">
+            <field name="name">api_model_1</field>
+        </record>
+
+    </data>
+</odoo>
