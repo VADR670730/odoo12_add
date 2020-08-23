@@ -3,10 +3,11 @@
 # Copyright 2018 Rafis Bikbov <https://it-projects.info/team/bikbov>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
-import base64
 import json
 import logging
+
 from odoo import http
+
 from . import pinguin
 
 _logger = logging.getLogger(__name__)
@@ -26,87 +27,7 @@ API_ENDPOINT = '/api'
 API_ENDPOINT_V1 = '/v1'
 
 
-API_ENDPOINT_V2 = '/v2'
-
-class ApiV2Controller(http.Controller):
-    _api_endpoint = API_ENDPOINT + API_ENDPOINT_V2
-    _api_endpoint = _api_endpoint + '/<namespace>'
-    _api_endpoint_model = _api_endpoint + '/<model>'
-    _api_endpoint_model_id = _api_endpoint + '/<model>/<int:id>'
-
-    _api_endpoint_image_file = _api_endpoint + '/image'
-
-    @pinguin.route2(_api_endpoint_image_file, methods=['POST'], type='http', auth='none', csrf=False, website=True, cors="*")
-    def v2_call_image_file(self, namespace, file, model_mame, res_id, field_name, method_name, method_params):
-        _logger.info('=======v2_call_image_file========0 %s %s %s %s %s %s' % (method_name, method_params, file, model_mame, res_id, field_name))
-        try:
-            res_id = int(res_id)
-            method_params = json.loads(method_params)
-            method_params.update({field_name: base64.b64encode(file.read())})
-
-            _logger.info('=======v2_call_image_file========1 %s %s' % (res_id, bool(res_id)))
-            if res_id:
-                _logger.info('=======v2_call_image_file========2 %s %s' % (model_mame, method_name) )
-                res = pinguin.wrap__resource_v2_call_method(
-                    modelname=model_mame,
-                    ids=[int(res_id)],
-                    method_name=method_name,
-                    method_params=method_params,
-                    success_code=pinguin.CODE__success)
-            else:
-                _logger.info('=======v2_call_image_file========3 %s %s' % (model_mame, method_name))
-                res = pinguin.wrap__resource_v2_call_class_method(
-                    modelname=model_mame,
-                    method_name=method_name,
-                    method_params=method_params,
-                    success_code=pinguin.CODE__success,
-                    context={},
-                )
-
-                _logger.info('=======v2_call_image_file========4 %s' % (res))
-
-        except Exception as e:
-            res = {'error_code': 999, 'error_message': str(e)}
-
-        _logger.info('=======v2_call_image_file========99 %s' % (res))
-        response = http.request.make_response(json.dumps(res, ensure_ascii=False))
-        response.headers.set('Content-Type', 'application/json;charset=UTF-8')
-        return response
-
-
-
-    @pinguin.route2(_api_endpoint_model_id, methods=['POST'], type='json', auth='none', csrf=False,  cors="*")
-    def v2_call_method_one__POST(self, namespace, model, id):
-        _logger.info('=======v2_call_method_one__POST========0 %s %s %s' % (namespace, model, id))
-
-        data_str = http.request.httprequest.data
-        _logger.info('=======v2_call_method_one__POST========1 %s' % (data_str))
-        if isinstance(data_str, bytes):
-            data_str = str(data_str, encoding="utf-8")
-            _logger.info('=======v2_call_method_one__POST========2 %s' % (data_str))
-
-        data = json.loads(data_str)
-        _logger.info('=======v2_call_method_one__POST========3 %s' % (data))
-        if ('method_name' not in data) or ('method_params' not in data):
-            raise Warning('method_name 和 method_params 是必须的参数')
-
-        method_name, method_params = data.get('method_name'), data.get('method_params')
-
-        _logger.info('=======v2_call_method_one__POST========4 %s %s %s %s' % (type(method_params), type(method_name), method_name, method_params))
-        res = pinguin.wrap__resource_v2_call_method(
-            modelname=model,
-            ids=[id],
-            method_name=method_name,
-            method_params=method_params,
-            success_code=pinguin.CODE__success)
-
-        _logger.info('=======v2_call_method_one__POST========5 %s' % (res))
-
-        return res
-        # response = http.request.make_response(json.dumps(res, ensure_ascii=False))
-        # response.headers.set('Content-Type', 'application/json;charset=UTF-8')
-        # return response
-
+# API_ENDPOINT_V2 = '/v2'
 
 # We patch the route decorator in pinguin.py
 # with authentication and DB inference logic.
@@ -213,7 +134,7 @@ class ApiV1Controller(http.Controller):
     # ######################
 
     # Call Method on Singleton Record (optional: method parameters)
-    @pinguin.route(_api_endpoint_model_id, methods=['POST', 'GET'], type='http', auth='none', csrf=False)
+    @pinguin.route(_api_endpoint_model_id, methods=['PATCH'], type='http', auth='none', csrf=False)
     def call_method_one__PATCH(self, namespace, model, id, method_name, method_params=None):
         conf = pinguin.get_model_openapi_access(namespace, model)
         pinguin.method_is_allowed(method_name, conf['method'])

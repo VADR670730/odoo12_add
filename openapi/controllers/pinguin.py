@@ -42,10 +42,6 @@ from psycopg2.extensions import ISOLATION_LEVEL_READ_COMMITTED
 import time
 import datetime
 from odoo.tools.misc import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
-import logging
-_logger = logging.getLogger(__name__)
-
-
 
 ####################################
 # Definition of global error codes #
@@ -173,16 +169,13 @@ def get_auth_header(headers, raise_exception=False):
 
     authorization = headers.get('Authorization') or headers.get('authorization')
     authorization_key = headers.get('Authorization-Key') or headers.get('authorization_key')
-
-
-    print()
     if (not authorization) or (not authorization_key):
         if raise_exception:
-            raise werkzeug.exceptions.HTTPException(response=error_response(*CODE__no_user_auth))
+            raise werkzeug.exceptions.HTTPException(response=error_response(*CODE__no_user))
 
     return authorization_key, authorization
 
-
+    print('===get_auth_header===', headers)
 
     # if not auth_header or not auth_header.startswith('Basic '):
     #     if raise_exception:
@@ -365,42 +358,6 @@ def route(*args, **kwargs):
     return decorator
 
 
-
-def route2(*args, **kwargs):
-    """
-    """
-    def decorator(controller_method):
-
-        @http_route(*args, **kwargs)
-        @functools.wraps(controller_method)
-        def controller_method_wrapper(*iargs, **ikwargs):
-            #auth_header = get_auth_header(request.httprequest.headers, raise_exception=True)
-            #db_name, user_token = get_data_from_auth_header(auth_header)
-
-            db_name, user_token = get_auth_header(request.httprequest.headers, raise_exception=True)
-            setup_db(request.httprequest, db_name)
-            authenticated_user = authenticate_token_for_user(user_token)
-            namespace = get_namespace_by_name_from_users_namespaces(authenticated_user, ikwargs['namespace'], raise_exception=True)
-            try:
-                _logger.info('===========route2.controller_method_wrapper============= %s  %s  %s' % (controller_method, iargs, ikwargs))
-                response = controller_method(*iargs, **ikwargs)
-                _logger.info('===========route2.controller_method_wrapper=============2 %s' % (response))
-
-            except werkzeug.exceptions.HTTPException as e:
-                response = e.response
-            except Exception as e:
-                traceback.print_exc()
-                if hasattr(e, 'error') and isinstance(e.error, Exception):
-                    e = e.error
-                response = error_response(
-                    status=500,
-                    error=type(e).__name__,
-                    error_descrip=e.name if hasattr(e, 'name') else str(e)
-                )
-            return response
-
-        return controller_method_wrapper
-    return decorator
 ############################
 # Pinguin Metadata Helpers #
 ############################
@@ -787,62 +744,6 @@ def wrap__resource__unlink_one(modelname, id, success_code):
         return error_response(*CODE__obj_not_found)
     record.unlink()
     return successful_response(success_code)
-
-def wrap__resource_v2_call_class_method(modelname, method_name, method_params, success_code, context={}):
-    model_obj = get_model_for_read(modelname)
-    try:
-        if method_name in ['create']:
-            result = getattr(model_obj.with_context(context), method_name)(method_params)
-            result = {'modelname': modelname, 'id': result.id}
-        else:
-            result = getattr(model_obj.with_context(context), method_name)(**method_params)
-        return {'error_code': 0, 'error_message': '', 'data': result}
-
-    except Exception as e:
-        return error_response(400, type(e).__name__, str(e))
-
-
-def wrap__resource_v2_call_method(modelname, ids, method_name, method_params, success_code):
-    """Function to call the model method for records by IDs.
-
-    :param str modelname: The name of the model.
-    :param list ids: The record ids of which we want to call method.
-    :param str method: The name of the method.
-    :param int success_code: The success code.
-
-    :returns: successful response if the method execution did not cause an error
-              otherwise error response
-    :rtype: werkzeug.wrappers.Response
-    """
-    _logger.info('=======wrap__resource_v2_call_method==1====== %s %s %s %s' % (modelname, ids, method_name, method_params))
-    model_obj = get_model_for_read(modelname)
-
-    if not hasattr(model_obj, method_name):
-        _logger.info('=======wrap__resource_c2_call_method==2=====方法不存在')
-        return {'error_code': 1, 'error_message': '方法不存在',  'data': {}}
-
-
-    records = model_obj.browse(ids).exists()
-
-
-    results = []
-
-    try:
-        for record in records:
-            if method_name in ['write']:
-                result = getattr(record, method_name)(method_params)
-            else:
-                result = getattr(record, method_name)(**method_params)
-            _logger.info('=======wrap__resource_c2_call_method===result=====%s' % (result))
-            results.append(result)
-        if len(ids) == 1 and len(results):
-            results = results[0]
-    except Exception as e:
-        return {'error_message': str(e)}
-
-    #return successful_response(success_code, data=results)
-
-    return {'error_code': 0,  'error_message': '', 'data': results}
 
 
 def wrap__resource__call_method(modelname, ids, method, method_params, success_code):
